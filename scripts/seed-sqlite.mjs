@@ -289,8 +289,10 @@ try{
       for(let i=0;i<items.length;i++){
         const item=createdRecord(items[i],i);
         const found=await sql('SELECT body FROM records WHERE district=? AND entity=? AND id=?',[district,entity,item.id]);
-        if(found.length){if(!JSON.parse(found[0].body).testData && !found[0].body.includes('"[PRUEBA]"') && !item.id.startsWith(prefix))
-          throw Error('Colisión con registro ajeno '+item.id);continue;}
+        if(found.length){
+          if(JSON.parse(found[0].body).testData!==true) throw Error('Colisión con registro ajeno: '+item.id);
+          continue;
+        }
         await sql('INSERT INTO records(district,entity,id,version,body) VALUES(?,?,?,?,?)',
           [district,entity,item.id,1,JSON.stringify({...item,testData:true})]);
         increments[entity]++;
@@ -305,7 +307,7 @@ try{
         id:id('campaign',1),sectorId:sector,title:'Campaña de abrigo [PRUEBA]',
         unit:'mantas',target:30,entries:[],closedAt:null
       }],
-      ['log/'+sector+'/'+iso+'/'+id('audit',0),{
+      ['log/'+sector+'/2000-01-01T00:00:00.000Z/'+id('audit',0),{
         actor:'Carga local de Ayni',action:'Se añadieron datos exclusivamente ficticios de prueba',at:iso
       }]
     ];
