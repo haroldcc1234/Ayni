@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+
+# Build y PWA
+dist/
+dist-demo/
+dev-dist/
+.vite/
+
+# Tests
+coverage/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Logs y temporales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+*.local
+.idea/
+.vscode/*
+!.vscode/extensions.json
+/server/data/
