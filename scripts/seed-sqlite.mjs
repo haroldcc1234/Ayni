@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { DatabaseSync, backup } from 'node:sqlite';
+import { DatabaseSync } from 'node:sqlite';
 import bcrypt from 'bcryptjs';
 import { openStore } from '../server/store.mjs';
 
@@ -256,7 +256,10 @@ if(!Array.isArray(credentials.accounts) || credentials.accounts.length!==memberP
 // Respaldo consistente de SQLite, incluyendo cambios presentes en el WAL.
 const snapshot = new DatabaseSync(dbPath,{readOnly:true});
 const backupPath=resolve(dirname(dbPath),'ayni-antes-carga-'+Date.now()+'.sqlite');
-try{ await backup(snapshot,backupPath); }finally{snapshot.close();}
+try{
+  // VACUUM INTO ofrece una copia SQLite coherente, compatible con Node.js 22.14.0.
+  snapshot.prepare('VACUUM INTO ?').run(backupPath);
+}finally{snapshot.close();}
 console.log('Respaldo creado:',backupPath);
 const store=await openStore({filename:dbPath});
 try{
